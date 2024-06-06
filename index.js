@@ -8,10 +8,6 @@ const port = process.env.PORT || 5000;
 
 //middleware
 
-// app.use(cors({
-//     origin: 'https://dreamspace-site.web.app'
-// }))
-
 app.use(cors())
 app.use(express.json());
 
@@ -66,7 +62,14 @@ async function run() {
             res.send(result)
         })
 
-        //get product from db;
+        //get product by email from db;
+
+        app.get('/products', async (req, res) => {
+            const result = await productCollection.find().toArray();
+            res.send(result)
+        })
+
+        //get product by email from db;
 
         app.get('/products', async (req, res) => {
             const email = req.query.email;

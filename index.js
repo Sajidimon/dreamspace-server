@@ -38,16 +38,30 @@ async function run() {
 
         //USER COLLECTION;
 
-        // save user to db;
-
-        app.post('/users', async (req, res) => {
-            const users = req.body;
-            const query = { email: users.email }
-            const existingUser = await userCollection.findOne(query);
-            if (existingUser) {
-                return res.send({ message: 'user already exists', insertedId: null })
+        // Save user email and role in DB
+        app.put('/users/:email', async (req, res) => {
+            const email = req.params.email
+            const user = req.body
+            const query = { email: email }
+            const options = { upsert: true }
+            const updateDoc = {
+                $set: user,
             }
-            const result = await userCollection.insertOne(users);
+            const result = await userCollection.updateOne(query, updateDoc, options)
+            res.send(result)
+        })
+
+        // Get user
+        app.get('/users', async (req, res) => {
+            const result = await userCollection.find().toArray();
+            res.send(result)
+        })
+
+        // Get single user
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = {email: email}
+            const result = await userCollection.findOne(query);
             res.send(result)
         })
 
@@ -62,7 +76,7 @@ async function run() {
             res.send(result)
         })
 
-        //get product by email from db;
+        //get product from db;
 
         app.get('/products', async (req, res) => {
             const result = await productCollection.find().toArray();
@@ -92,7 +106,7 @@ async function run() {
         app.get('/products/category/:category', async (req, res) => {
             const productCategory = req.params.category;
             const query = { category: productCategory };
-            const result = await productCollection.findOne(query)
+            const result = await productCollection.find(query).toArray();
             res.send(result)
         })
 
